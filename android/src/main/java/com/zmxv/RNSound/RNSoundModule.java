@@ -201,7 +201,7 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
       }
       return mediaPlayer;
     }
-    
+
     return null;
   }
 
@@ -223,8 +223,9 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
     if (!this.mixWithOthers) {
       AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
-      audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-
+      //audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+      //This allows the sound to duck
+      audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
       this.focusedPlayerKey = key;
     }
 
@@ -286,10 +287,11 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
     }
 
     // Release audio focus in Android system
-    if (!this.mixWithOthers && key == this.focusedPlayerKey) {
+    //This had to be commented, don't ask why, cannot remember. I think it didn't go to abandon properly
+    //if (!this.mixWithOthers && key == this.focusedPlayerKey) {
       AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
       audioManager.abandonAudioFocus(this);
-    }
+    //}
 
     callback.invoke();
   }
@@ -317,7 +319,7 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
       }
     }
   }
-	
+
   @Override
   public void onCatalystInstanceDestroy() {
     java.util.Iterator it = this.playerPool.entrySet().iterator();
